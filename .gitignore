@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtualenv
+.venv/
+venv/
+env/
+
+# SQLite-Datenbank (lokale Daten, nicht versionieren)
+questions.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
