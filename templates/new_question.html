@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Neue Frage anlegen</h2>
+
+<form method="POST" action="{{ url_for('new_question') }}">
+
+    <label for="topic_id"><strong>Thema:</strong></label>
+    <select name="topic_id" id="topic_id" required>
+        <option value="">-- Thema auswählen --</option>
+        {% for t in topics %}
+            <option value="{{ t['id'] }}">{{ t['name'] }}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+
+    <label for="text"><strong>Fragetext:</strong></label><br>
+    <textarea id="text" name="text" rows="4" cols="70" required></textarea>
+    <br><br>
+
+    <label for="difficulty"><strong>Schwierigkeit (1–5):</strong></label>
+    <input type="number" id="difficulty" name="difficulty" min="1" max="5" value="1">
+    <br><br>
+
+    <label for="points"><strong>Punkte:</strong></label>
+    <input type="number" id="points" name="points" step="0.5" value="1">
+    <br><br>
+
+    <label for="solution"><strong>Lösung / Stichworte:</strong></label><br>
+    <textarea id="solution" name="solution" rows="3" cols="70"></textarea>
+    <br><br>
+
+    <button type="submit">Frage speichern</button>
+</form>
+
+<p><a href="{{ url_for('index') }}">Zurück zur Übersicht</a></p>
+
+{% endblock %}

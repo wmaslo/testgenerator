@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Frage bearbeiten</h2>
+
+<form method="POST">
+
+    <label for="topic_id"><strong>Thema:</strong></label>
+    <select name="topic_id" id="topic_id" required>
+        {% for t in topics %}
+            <option value="{{ t['id'] }}"
+                    {% if t['id'] == question['topic_id'] %}selected{% endif %}>
+                {{ t['name'] }}
+            </option>
+        {% endfor %}
+    </select>
+    <br><br>
+
+    <label for="text"><strong>Fragetext:</strong></label><br>
+    <textarea id="text" name="text" rows="4" cols="70" required>{{ question['text'] }}</textarea>
+    <br><br>
+
+    <label for="difficulty"><strong>Schwierigkeit:</strong></label>
+    <input type="number" id="difficulty" name="difficulty" min="1" max="5" value="{{ question['difficulty'] }}">
+    <br><br>
+
+    <label for="points"><strong>Punkte:</strong></label>
+    <input type="number" id="points" name="points" step="0.5" value="{{ question['points'] }}">
+    <br><br>
+
+    <label for="solution"><strong>Lösung / Stichworte:</strong></label><br>
+    <textarea id="solution" name="solution" rows="3" cols="70">{{ question['solution'] }}</textarea>
+    <br><br>
+
+    <button type="submit">Speichern</button>
+</form>
+
+<p><a href="{{ url_for('topic_questions', topic_id=question['topic_id']) }}">Zurück</a></p>
+
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Neuen Test anlegen</h2>
+
+<form method="POST" action="{{ url_for('new_test') }}">
+
+    <label for="name"><strong>Name des Tests:</strong></label><br>
+    <input type="text" id="name" name="name" size="60" required>
+    <br><br>
+
+    <label for="date"><strong>Datum:</strong></label><br>
+    <input type="date" id="date" name="date">
+    <br><br>
+
+    <label for="notes"><strong>Notizen:</strong></label><br>
+    <textarea id="notes" name="notes" rows="3" cols="60"></textarea>
+    <br><br>
+
+    <button type="submit">Test speichern</button>
+</form>
+
+<p><a href="{{ url_for('list_tests') }}">Zurück zur Testübersicht</a></p>
+{% endblock %}

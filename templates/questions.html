@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if topic %}
+        <h2>Fragen zu: {{ topic['name'] }}</h2>
+        {% if topic['description'] %}
+            <p><em>{{ topic['description'] }}</em></p>
+        {% endif %}
+    {% else %}
+        <h2>Thema nicht gefunden</h2>
+    {% endif %}
+
+    {% if questions %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Fragetext</th>
+                    <th>Schwierigkeit</th>
+                    <th>Punkte</th>
+                    <th>Aktionen</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for q in questions %}
+                    <tr>
+                        <td>{{ q['id'] }}</td>
+                        <td>{{ q['text'] }}</td>
+                        <td>{{ q['difficulty'] }}</td>
+                        <td>{{ q['points'] }}</td>
+                        <td>
+                            <a href="{{ url_for('edit_question', question_id=q['id']) }}">Bearbeiten</a>
+                            |
+                            <form method="POST"
+                                  action="{{ url_for('delete_question', question_id=q['id']) }}"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('Frage wirklich löschen?');">
+                                <button type="submit">Löschen</button>
+                            </form>
+                        </td>
+                        
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Keine Fragen zu diesem Thema.</p>
+    {% endif %}
+
+    <p><a href="{{ url_for('index') }}">Zurück zur Themenübersicht</a></p>
+{% endblock %}

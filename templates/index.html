@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Themen</h2>
+    <ul>
+        {% for t in topics %}
+            <li>
+                <a href="{{ url_for('topic_questions', topic_id=t['id']) }}">
+                    {{ t['name'] }}
+                </a>
+                {% if t['description'] %}
+                    – <small>{{ t['description'] }}</small>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
