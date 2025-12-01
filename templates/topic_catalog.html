@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Fragenkatalog – {{ topic['name'] }}</h2>
+
+    {% if topic['description'] %}
+        <p><em>{{ topic['description'] }}</em></p>
+    {% endif %}
+
+    <hr>
+
+    {% if questions %}
+        <ol>
+            {% for q in questions %}
+                <li>
+                    <div>
+                        {{ q['text'] }}
+                    </div>
+
+                    {# optional: freies Antwortfeld, wenn du willst #}
+                    <div class="answer-block"></div>
+                </li>
+            {% endfor %}
+        </ol>
+    {% else %}
+        <p>Für dieses Thema sind noch keine Fragen erfasst.</p>
+    {% endif %}
+{% endblock %}

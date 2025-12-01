@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Thema bearbeiten</h2>
+
+    <form method="post">
+        <div>
+            <label for="name">Name des Themas:</label><br>
+            <input
+                type="text"
+                id="name"
+                name="name"
+                value="{{ topic['name'] }}"
+                required
+            >
+        </div>
+
+        <div style="margin-top: 0.5rem;">
+            <label for="description">Beschreibung (optional):</label><br>
+            <textarea
+                id="description"
+                name="description"
+                rows="3"
+            >{{ topic['description'] or '' }}</textarea>
+        </div>
+
+        <div style="margin-top: 1rem;">
+            <button type="submit">Speichern</button>
+            <a href="{{ url_for('index') }}">Abbrechen</a>
+        </div>
+    </form>
+{% endblock %}

@@ -324,5 +324,165 @@ def edit_test(test_id):
     conn.close()
     return render_template("edit_test.html", test=test)
 
+@app.route("/topic/new", methods=["GET", "POST"])
+def new_topic():
+    conn = get_db_connection()
+
+    if request.method == "POST":
+        name = request.form["name"].strip()
+        description = request.form.get("description", "").strip()
+
+        if name:
+            conn.execute(
+                "INSERT INTO topics (name, description) VALUES (?, ?)",
+                (name, description),
+            )
+            conn.commit()
+            conn.close()
+            return redirect(url_for("index"))
+
+    conn.close()
+    return render_template("new_topic.html")
+
+@app.route("/topic/<int:topic_id>/edit", methods=["GET", "POST"])
+def edit_topic(topic_id):
+    conn = get_db_connection()
+
+    # Thema laden
+    topic = conn.execute(
+        "SELECT id, name, description FROM topics WHERE id = ?",
+        (topic_id,)
+    ).fetchone()
+
+    if topic is None:
+        conn.close()
+        return "Thema nicht gefunden", 404
+
+    if request.method == "POST":
+        name = request.form["name"].strip()
+        description = request.form.get("description", "").strip()
+
+        if name:
+            conn.execute(
+                """
+                UPDATE topics
+                SET name = ?, description = ?
+                WHERE id = ?
+                """,
+                (name, description, topic_id)
+            )
+            conn.commit()
+            conn.close()
+            # Nach dem Bearbeiten z.B. zurück zur Themenliste
+            return redirect(url_for("index"))
+
+    conn.close()
+    return render_template("edit_topic.html", topic=topic)
+
+@app.route("/tests/<int:test_id>/duplicate", methods=["POST"])
+def duplicate_test(test_id):
+    conn = get_db_connection()
+
+    # Original-Test laden
+    original = conn.execute(
+        "SELECT id, name, date, notes FROM tests WHERE id = ?",
+        (test_id,)
+    ).fetchone()
+
+    if original is None:
+        conn.close()
+        return "Test nicht gefunden", 404
+
+    # Neuen Namen erzeugen, z.B. "Alter Name (Kopie)"
+    new_name = f"{original['name']} (Kopie)"
+    new_date = original["date"]      # kannst du auch auf "" setzen, wenn du willst
+    new_notes = original["notes"]
+
+    # Neuen Test eintragen
+    cursor = conn.execute(
+        "INSERT INTO tests (name, date, notes) VALUES (?, ?, ?)",
+        (new_name, new_date, new_notes)
+    )
+    new_test_id = cursor.lastrowid
+
+    # Zugehörige Fragen übernehmen (Positionen beibehalten)
+    conn.execute(
+        """
+        INSERT INTO test_questions (test_id, question_id, position)
+        SELECT ?, question_id, position
+        FROM test_questions
+        WHERE test_id = ?
+        """,
+        (new_test_id, test_id)
+    )
+
+    conn.commit()
+    conn.close()
+
+    # Entweder zurück zur Übersicht...
+    return redirect(url_for("list_tests"))
+    # ...oder direkt in den neuen Test:
+    # return redirect(url_for("edit_test", test_id=new_test_id))
+
+@app.route("/tests/<int:test_id>/delete", methods=["POST"])
+def delete_test(test_id):
+    conn = get_db_connection()
+
+    # Test existiert?
+    test = conn.execute(
+        "SELECT id FROM tests WHERE id = ?",
+        (test_id,)
+    ).fetchone()
+
+    if test is None:
+        conn.close()
+        return "Test nicht gefunden", 404
+
+    # Zugeordnete Fragen löschen
+    conn.execute(
+        "DELETE FROM test_questions WHERE test_id = ?",
+        (test_id,)
+    )
+
+    # Selbst den Test löschen
+    conn.execute(
+        "DELETE FROM tests WHERE id = ?",
+        (test_id,)
+    )
+
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for("list_tests"))
+
+@app.route("/topic/<int:topic_id>/catalog")
+def topic_catalog(topic_id):
+    conn = get_db_connection()
+
+    # Thema laden
+    topic = conn.execute(
+        "SELECT id, name, description FROM topics WHERE id = ?",
+        (topic_id,)
+    ).fetchone()
+
+    if topic is None:
+        conn.close()
+        return "Thema nicht gefunden", 404
+
+    # Alle Fragen zu diesem Thema laden
+    questions = conn.execute(
+        """
+        SELECT id, text
+        FROM questions
+        WHERE topic_id = ?
+        ORDER BY id
+        """,
+        (topic_id,)
+    ).fetchall()
+
+    conn.close()
+
+    return render_template("topic_catalog.html", topic=topic, questions=questions)
+
 if __name__ == "__main__":
     app.run(debug=True)
