@@ -184,5 +184,112 @@ def new_test():
     conn.close()
     return render_template("new_test.html")
 
+@app.route("/tests/<int:test_id>/questions", methods=["GET", "POST"])
+def edit_test_questions(test_id):
+    conn = get_db_connection()
+
+    # Test laden
+    test = conn.execute(
+        "SELECT id, name, date, notes FROM tests WHERE id = ?",
+        (test_id,)
+    ).fetchone()
+
+    if test is None:
+        conn.close()
+        return "Test nicht gefunden", 404
+
+    if request.method == "POST":
+        # Liste der ausgewählten Fragen (als Strings)
+        selected_ids = request.form.getlist("question_ids")
+        # In Integers umwandeln
+        selected_ids = [int(qid) for qid in selected_ids]
+
+        # Alte Zuordnungen löschen
+        conn.execute(
+            "DELETE FROM test_questions WHERE test_id = ?",
+            (test_id,)
+        )
+
+        # Neue Zuordnungen einfügen, Position = Reihenfolge der Auswahl
+        position = 1
+        for qid in selected_ids:
+            conn.execute(
+                """
+                INSERT INTO test_questions (test_id, question_id, position)
+                VALUES (?, ?, ?)
+                """,
+                (test_id, qid, position)
+            )
+            position += 1
+
+        conn.commit()
+        conn.close()
+        # Zur Testliste zurück – oder wieder auf diese Seite -->
+        return redirect(url_for("list_tests"))
+
+    # GET: alle Fragen + markieren, welche schon im Test sind
+    questions = conn.execute(
+        """
+        SELECT
+            q.id,
+            q.text,
+            q.difficulty,
+            q.points,
+            t.name AS topic_name,
+            CASE WHEN tq.test_id IS NULL THEN 0 ELSE 1 END AS is_selected
+        FROM questions q
+        JOIN topics t ON q.topic_id = t.id
+        LEFT JOIN test_questions tq
+            ON tq.test_id = ? AND tq.question_id = q.id
+        ORDER BY t.name, q.id
+        """,
+        (test_id,)
+    ).fetchall()
+
+    conn.close()
+
+    return render_template(
+        "test_questions.html",
+        test=test,
+        questions=questions
+    )
+
+@app.route("/tests/<int:test_id>/preview")
+def test_preview(test_id):
+    conn = get_db_connection()
+
+    # Test laden
+    test = conn.execute(
+        "SELECT id, name, date, notes FROM tests WHERE id = ?",
+        (test_id,)
+    ).fetchone()
+
+    if test is None:
+        conn.close()
+        return "Test nicht gefunden", 404
+
+    # Fragen zum Test in der richtigen Reihenfolge laden
+    questions = conn.execute(
+        """
+        SELECT
+            q.id,
+            q.text,
+            q.points,
+            t.name AS topic_name,
+            tq.position
+        FROM test_questions tq
+        JOIN questions q ON q.id = tq.question_id
+        JOIN topics t ON t.id = q.topic_id
+        WHERE tq.test_id = ?
+        ORDER BY tq.position
+        """,
+        (test_id,)
+    ).fetchall()
+
+    conn.close()
+
+    return render_template("test_preview.html", test=test, questions=questions)
+
+
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Fragen für Test zuordnen</h2>
+
+<p>
+    <strong>Test:</strong> {{ test['name'] }}<br>
+    {% if test['date'] %}<strong>Datum:</strong> {{ test['date'] }}<br>{% endif %}
+    {% if test['notes'] %}<strong>Notizen:</strong> {{ test['notes'] }}{% endif %}
+</p>
+
+<form method="POST">
+
+    <table>
+        <thead>
+            <tr>
+                <th>Auswahl</th>
+                <th>Thema</th>
+                <th>ID</th>
+                <th>Fragetext</th>
+                <th>Schwierigkeit</th>
+                <th>Punkte</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for q in questions %}
+                <tr>
+                    <td>
+                        <input
+                            type="checkbox"
+                            name="question_ids"
+                            value="{{ q['id'] }}"
+                            {% if q['is_selected'] %}checked{% endif %}
+                        >
+                    </td>
+                    <td>{{ q['topic_name'] }}</td>
+                    <td>{{ q['id'] }}</td>
+                    <td>{{ q['text'] }}</td>
+                    <td>{{ q['difficulty'] }}</td>
+                    <td>{{ q['points'] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br>
+    <button type="submit">Zuordnung speichern</button>
+</form>
+
+<p>
+    <a href="{{ url_for('list_tests') }}">Zurück zur Testübersicht</a>
+</p>
+{% endblock %}
