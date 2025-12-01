@@ -290,6 +290,39 @@ def test_preview(test_id):
 
     return render_template("test_preview.html", test=test, questions=questions)
 
+@app.route("/tests/<int:test_id>/edit", methods=["GET", "POST"])
+def edit_test(test_id):
+    conn = get_db_connection()
+
+    test = conn.execute(
+        "SELECT id, name, date, notes FROM tests WHERE id = ?",
+        (test_id,)
+    ).fetchone()
+
+    if test is None:
+        conn.close()
+        return "Test nicht gefunden", 404
+
+    if request.method == "POST":
+        name = request.form["name"].strip()
+        date = request.form.get("date", "").strip()
+        notes = request.form.get("notes", "").strip()
+
+        if name:
+            conn.execute(
+                """
+                UPDATE tests
+                SET name = ?, date = ?, notes = ?
+                WHERE id = ?
+                """,
+                (name, date, notes, test_id),
+            )
+            conn.commit()
+            conn.close()
+            return redirect(url_for("list_tests"))
+
+    conn.close()
+    return render_template("edit_test.html", test=test)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -24,9 +24,10 @@
                     <td>{{ t['date'] }}</td>
                     <td>{{ t['notes'] }}</td>
 	            <td>
-        		<a href="{{ url_for('edit_test_questions', test_id=t['id']) }}">
-            			Fragen zuordnen
-        		</a>
+			<a href="{{ url_for('edit_test', test_id=t['id']) }}">Bearbeiten</a>
+    			|
+			<a href="{{ url_for('edit_test_questions', test_id=t['id']) }}">Fragen zuordnen</a>
+    			|
 			<a href="{{ url_for('test_preview', test_id=t['id']) }}">Vorschau / Drucken</a>
     		    </td>
                 </tr>
