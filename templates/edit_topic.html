@@ -29,4 +29,25 @@
             <a href="{{ url_for('index') }}">Abbrechen</a>
         </div>
     </form>
+
+    <hr style="margin: 2rem 0;">
+
+    <!-- Thema löschen -->
+<hr style="margin: 2rem 0;">
+
+<form action="{{ url_for('delete_topic', topic_id=topic['id']) }}"
+      method="post"
+      onsubmit="return confirm('Willst du das Thema „{{ topic['name'] }}“ samt ALLEN zugehörigen Fragen wirklich löschen?');">
+
+    <button type="submit"
+            style="background:none; border:none; color:red; cursor:pointer; padding:0; font-size:1rem;">
+        Thema löschen
+    </button>
+
+    <small style="color:#666;">
+        (Achtung: Alle Fragen in diesem Thema werden ebenfalls gelöscht)
+    </small>
+
+</form>
+
 {% endblock %}

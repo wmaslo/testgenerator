@@ -484,5 +484,47 @@ def topic_catalog(topic_id):
 
     return render_template("topic_catalog.html", topic=topic, questions=questions)
 
+@app.route("/topic/<int:topic_id>/delete", methods=["POST"])
+def delete_topic(topic_id):
+    conn = get_db_connection()
+
+    # Thema laden
+    topic = conn.execute(
+        "SELECT id, name FROM topics WHERE id = ?",
+        (topic_id,)
+    ).fetchone()
+
+    if topic is None:
+        conn.close()
+        return "Thema nicht gefunden", 404
+
+    # Test-Zuordnungen für Fragen dieses Themas löschen
+    conn.execute(
+        """
+        DELETE FROM test_questions
+        WHERE question_id IN (
+            SELECT id FROM questions WHERE topic_id = ?
+        )
+        """,
+        (topic_id,)
+    )
+
+    # Fragen des Themas löschen
+    conn.execute(
+        "DELETE FROM questions WHERE topic_id = ?",
+        (topic_id,)
+    )
+
+    # Thema löschen
+    conn.execute(
+        "DELETE FROM topics WHERE id = ?",
+        (topic_id,)
+    )
+
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for("index"))
+
 if __name__ == "__main__":
     app.run(debug=True)
