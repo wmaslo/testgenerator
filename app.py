@@ -2,7 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for
 import sqlite3
 import os
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "questions.db")
+BASE_DIR = os.path.dirname(__file__)
+DB_PATH = os.path.join(BASE_DIR, "data", "questions.db")
 
 app = Flask(__name__)
 
@@ -527,4 +528,4 @@ def delete_topic(topic_id):
     return redirect(url_for("index"))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

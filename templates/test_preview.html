@@ -13,6 +13,12 @@
         h1, h2, h3 {
             margin-bottom: 0.2cm;
         }
+		.question {
+			page-break-inside: avoid !important;
+			break-inside: avoid !important;
+			margin-bottom: 2rem; /* optional für mehr Abstand */
+			padding-bottom: 1rem; /* optional für Optik */
+		}
     }
 
     .meta {
@@ -86,12 +92,36 @@
             </div>
 
             <!-- Platz für Schüler-Antworten -->
-	    	<div class="answer-block"></div>
+	    	<div class="answer-block">
             </div>
         </div>
     {% endfor %}
 {% else %}
     <p>Diesem Test sind noch keine Fragen zugeordnet.</p>
 {% endif %}
+
+<hr style="margin-top: 40px;">
+
+<!-- Notenschlüssel -->
+<div class="grading-info" style="margin-bottom: 12px; font-size: 12px; color: #444;">
+    <strong>Notenschlüssel:</strong>
+    [Sehr gut (1) ≥ 91 %] –
+    [Gut (2) ≥ 81 %] –
+    [Befriedigend (3) ≥ 61 %] –
+    [Genügend (4) ≥ 51 %] –
+    [Nicht genügend (5) ≥ 0 %]
+</div>
+
+<!-- Bewertungstabelle -->
+<table class="grading-table" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+    <tr>
+        <td style="border: 1px solid #aaa; padding: 8px; width: 40%;">
+            Punkteanzahl:
+        </td>
+        <td style="border: 1px solid #aaa; padding: 8px; width: 60%;">
+            Beurteilung:
+        </td>
+    </tr>
+</table>
 
 {% endblock %}
