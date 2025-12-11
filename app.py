@@ -3,7 +3,10 @@ import sqlite3
 import os
 
 BASE_DIR = os.path.dirname(__file__)
-DB_PATH = os.path.join(BASE_DIR, "data", "questions.db")
+DB_PATH = os.environ.get(
+    "DB_PATH",  # wenn gesetzt, diesen Pfad nehmen
+    os.path.join(BASE_DIR, "data", "questions.db")  # sonst Standard
+)
 
 app = Flask(__name__)
 

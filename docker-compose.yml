@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  testgenerator:
+    image: testgenerator:latest
+    container_name: testgenerator
+    restart: unless-stopped
+
+    # Flask hört in app.py auf Port 5000
+    ports:
+      - "8050:5000"
+
+    # Dein Projektordner auf dem NAS wird nach /app gemountet
+    working_dir: /app
+    volumes:
+      - /volume1/docker/testgenerator:/app
+
+    # Optional: explizit DB_PATH setzen (nicht zwingend nötig,
+    # weil du in app.py schon BASE_DIR/data/questions.db verwendest)
+    # environment:
+    #   - DB_PATH=/app/data/questions.db
